@@ -1,0 +1,46 @@
+#+TITLE: mem-dump
+#+AUTHOR: calx
+
+~mem-dump~ loads an ELF binary into the memory, sets a breakpoint at
+the entrypoint of the ELF binary, and dumps all the registers and
+memory after reaching the entrypoint.
+
+* Usage
+
+#+BEGIN_SRC sh
+  ./mem-dump [-o OUTPUT-FILENAME] PROG [ARGS...]
+#+END_SRC
+
+Dumps to file ~mem.dump~ by default.
+
+** Examples
+
+#+BEGIN_SRC sh
+  ./mem-dump ./mem-dump
+#+END_SRC
+
+#+BEGIN_SRC sh
+  ./mem-dump echo nice
+#+END_SRC
+
+#+BEGIN_SRC sh
+  ./mem-dump -o echo.dump echo nice
+#+END_SRC
+
+* Inspirations
+
+- Option parsing
+
+  [[https://github.com/strace/strace][strace]]
+
+- Resolving the binary pathname
+
+  [[https://github.com/strace/strace][strace]]
+
+- Parsing ~/proc/<pid>/maps~
+
+  [[https://github.com/Harmos274/libprocmaps][libprocmaps]]
+
+- Rest ~ptrace~ related usage
+
+  [[https://github.com/strace/strace][strace]] and <https://blog.tartanllama.xyz/writing-a-linux-debugger-setup/>
