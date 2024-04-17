@@ -11,8 +11,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include <errno.h>
-
 // should probably increase it, but meh
 #define PATH_MAX 100
 
@@ -389,7 +387,6 @@ debugger_create_breakpoint(pid_t pid, uint64_t addr)
     uint64_t oldvalue = ptrace(PTRACE_PEEKDATA, pid, addr, NULL);
     uint64_t newvalue = (oldvalue & ~0xFF) | 0xCC;
     ptrace(PTRACE_POKEDATA, pid, addr, newvalue);
-    printf("PEEKDATA: 0x%016lx 0x%016lx\n", addr, oldvalue);
     return (breakpoint) {
         .mem_addr = addr,
         .mem_oldvalue = oldvalue
@@ -468,11 +465,7 @@ main(int argc, char *argv[], char *environ[])
 
     print_info("pid: %d", pid);
 
-    // debugger_printregs(pid);
-
-    print_info("data: 0x%016lx", debugger_readmem(pid, newentrypoint));
-
-    printf("new entrypoint: 0x%lx\n", newentrypoint);
+    print_info("new entrypoint: 0x%lx\n", newentrypoint);
     breakpoint bpt = debugger_create_breakpoint(pid, newentrypoint);
     debugger_continue(pid);
 
@@ -490,13 +483,6 @@ main(int argc, char *argv[], char *environ[])
         printf("0x%1lx - 0x%1lx: (0x%06lx) %s\n",
                addr_begin, addr_end, offset, pathname);
     }
-
-    ptrace(PTRACE_ATTACH, pid, NULL, NULL);
-    printf("mem at entrypoint: 0x%016lx\n",
-           debugger_readmem(pid, newentrypoint));
-    ptrace(PTRACE_DETACH, pid, NULL, NULL);
-
-    debugger_printregs(stdout, pid);
 
     (void) bpt;
     // debugger_remove_breakpoint(pid, bpt);
