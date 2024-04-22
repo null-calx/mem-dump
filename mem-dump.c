@@ -320,15 +320,18 @@ debugger_writemem(pid_t pid, uint64_t addr, uint64_t data)
 
 void
 debugger_dumpmem(FILE *restrict stream, pid_t pid,
-                 uint64_t addr_from, uint64_t addr_to)
+                 uint64_t addr_from, uint64_t addr_to,
+                 char* pathname, off_t offset, char *perms)
 {
-    fprintf(stream, "DUMPING MEMORY\n0x%016lx - 0x%016lx\n",
-            addr_from, addr_to);
+    fprintf(stream, "DUMPING MEMORY\n0x%016lx - 0x%016lx\n%s\n0x%06lx\n%s\n",
+            addr_from, addr_to,
+            pathname, offset, perms);
     uint64_t data;
-    for (uint64_t addr = addr_from; addr < addr_to; addr += 8) {
-        data = debugger_readmem(pid, addr);
-        fprintf(stream, "0x%016lx : 0x%016lx\n", addr, data);
-    }
+    if (perms[0] == 'r')
+        for (uint64_t addr = addr_from; addr < addr_to; addr += 8) {
+            data = debugger_readmem(pid, addr);
+            fprintf(stream, "0x%016lx : 0x%016lx\n", addr, data);
+        }
     fprintf(stream, "\n");
 }
 
@@ -471,6 +474,10 @@ main(int argc, char *argv[], char *environ[])
 
     debugger_jumpto(pid, newentrypoint);
 
+    fprintf(outfile, "BINARY: %s\n", pathname);
+    fprintf(outfile, "ENTRYPOINT: 0x%016lx\n", newentrypoint);
+    fprintf(outfile, "\n");
+
     debugger_printregs(stdout, pid);
     debugger_printregs(outfile, pid);
 
@@ -479,7 +486,10 @@ main(int argc, char *argv[], char *environ[])
         uint64_t addr_end   = table[i]->addr_end;
         off_t offset        = table[i]->offset;
         char *pathname      = table[i]->pathname;
-        debugger_dumpmem(outfile, pid, addr_begin, addr_end);
+	char *perms         = table[i]->perms;
+        debugger_dumpmem(outfile, pid,
+                         addr_begin, addr_end,
+                         pathname, offset, perms);
         printf("0x%1lx - 0x%1lx: (0x%06lx) %s\n",
                addr_begin, addr_end, offset, pathname);
     }
