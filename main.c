@@ -52,7 +52,6 @@ main(int argc, char *argv[], char *envp[])
 
     // parent process
     info("child pid: %d", pid);
-    outfile = fopen(outfname, "w");
 
     debugger_prepared(pid);
     table = parse_procmaps(pid);
@@ -62,15 +61,16 @@ main(int argc, char *argv[], char *envp[])
 
     debugger_continue_until(pid, newentrypoint);
 
+    outfile = fopen(outfname, "w");
     debugger_dump_registers(pid, outfile);
     debugger_dump_memory(pid, table, outfile);
+    fclose(outfile);
     info("dumped to file: %s", outfname);
 
     kill(pid, 9);
     info("killed child");
 
     destroy_procmaps_table(table);
-    fclose(outfile);
     info("bye..");
 
     return 0;

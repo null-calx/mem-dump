@@ -5,6 +5,8 @@
 the entrypoint of the ELF binary, and dumps all the registers and
 memory after reaching the entrypoint.
 
+Note: This only works on x86_64 linux system.
+
 * Usage
 
 #+BEGIN_SRC sh
