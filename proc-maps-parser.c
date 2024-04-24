@@ -116,7 +116,8 @@ destroy_procmaps_table(procmaps_table *table)
     free(table);
 }
 
-off_t
+static inline
+uint64_t
 loading_offset(procmaps_table *table)
 {
     return table[0]->addr_begin;
