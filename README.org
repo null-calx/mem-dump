@@ -27,6 +27,22 @@ Dumps to file ~mem.dump~ by default.
   ./mem-dump -o echo.dump echo nice
 #+END_SRC
 
+* How it works
+
+1. Parses command-line arguments to figure out output filename.
+2. Checks to see if the binary needs to searched in PATH environment
+   variable, if yes, then finds it.
+3. Parses the ELF binary to figure out binary's entrypoint.
+4. Forks, and the child calls ~ptrace(PTRACE_TRACEME, ...)~.
+5. Child then calls ~execve(PROC, ARGS...)~.
+6. Parent parses the child's ~/proc/<pid>/maps~ file, to find the
+   entrypoint in the memory of the process.
+7. Adds ~0xCC~ software interupt at the found memory address.
+8. Continues the child until ~0xCC~.
+9. Corrects everythings back in the child.
+10. Dumps registers, and memory.
+11. Kills the child.
+
 * Inspirations
 
 - Option parsing
