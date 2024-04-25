@@ -59,7 +59,11 @@ main(int argc, char *argv[], char *envp[])
     newentrypoint = loading_offset(table) + entrypoint;
     info("new entrypoint: 0x%016lx", newentrypoint);
 
+    destroy_procmaps_table(table);
+
     debugger_continue_until(pid, newentrypoint);
+
+    table = parse_procmaps(pid);
 
     outfile = fopen(outfname, "w");
     debugger_dump_registers(pid, outfile);
