@@ -12,7 +12,7 @@ def parse_block(block):
         for line in block[1:]:
             reg_value_iter = iter(filter(lambda x: x != '', line.split(' ')))
             for reg_name in reg_value_iter:
-                regs[reg_name] = next(reg_value_iter)
+                regs[reg_name] = int(next(reg_value_iter), 16)
         return regs
     elif block[0] == 'DUMPING MEMORY':
         addr_begin, addr_end = list(map(lambda x: int(x, 16), block[1][5:].split(' - '))) # one liner, let's gooo
